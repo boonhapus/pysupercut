@@ -12,7 +12,7 @@ That format — the **supercut** — is the north star for this project.
 
 ## What this project is
 
-`video-dedup` is a pre-processing engine for supercut creation. Given a set of video files in chronological order, it:
+`pysupercut` is a pre-processing engine for supercut creation. Given a set of video files in chronological order, it:
 
 1. Detects content that appears more than once across files (overlapping segments, repeated cold opens, recap sequences)
 2. Removes the duplicates
@@ -50,7 +50,7 @@ The goal is to **reduce the time between having the source files and having some
 ```
 Source episodes (raw files)
         ↓
-  [ video-dedup ]       ← this project
+  [ pysupercut ]        ← this project
         ↓
 Deduplicated continuous file
         ↓
@@ -67,7 +67,7 @@ The tool shortens the gap between the first and third row. Everything below the 
 
 The tool is successful when an editor working on a 12-episode anime arc can:
 
-1. Pass the episode files to `video-dedup` in order
+1. Pass the episode files to `pysupercut` in order
 2. Review the `--dry-run` output and trust it
 3. Run the stitch and receive a clean file with no duplicate content and no visible cut artefacts
 4. Open that file in their editor and begin creative work immediately — without first spending hours on mechanical cleanup

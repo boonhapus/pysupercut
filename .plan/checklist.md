@@ -1,4 +1,4 @@
-# video-dedup — build checklist
+# pysupercut — build checklist
 
 MVP phases marked **[MVP]**. Complete these first before polish.
 
