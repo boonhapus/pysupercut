@@ -7,4 +7,10 @@ wheels/
 *.egg-info
 
 # Virtual environments
-.venv
+.venv/
+
+# Mac build files
+.DS_Store
+
+# Project Data
+.data/
