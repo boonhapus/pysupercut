@@ -114,25 +114,35 @@ def _keep_range_for_file(
             f"[DEBUG]   match with {other.name}: my_range={my_range.start:.1f}-{my_range.end:.1f}, other_range={other_range.start:.1f}-{other_range.end:.1f}"
         )
 
-        if other_idx < my_idx:
-            # Predecessor overlaps with MY start
-            # Use OTHER file's range to know where predecessor's content ends
-            candidate = other_range.end
-            print(
-                f"[DEBUG]     predecessor (idx {other_idx}) < my_idx {my_idx}, candidate={candidate:.1f}"
-            )
-            if candidate > start_trim:
-                start_trim = candidate
+if other_idx < my_idx:
+            # Predecessor: other file appears BEFORE me
+            # Check if the match is at the START of my file (recap situation)
+            # If my_range.start is near 0, the match is at my start = duplicate intro
+            if my_range.start < 60.0:
+                # Match at my start = I'm the successor with duplicate intro
+                # Keep from where my unique content starts (after the dup)
+                candidate = my_range.end
+                print(f"[DEBUG]     predecessor: dup at MY start, trim MY start to {candidate:.1f}")
+                if candidate > start_trim:
+                    start_trim = candidate
+            else:
+                # Match elsewhere - this is NOT a duplicate intro to trim
+                print(f"[DEBUG]     predecessor: dup NOT at MY start, no trim")
 
         if other_idx > my_idx:
-            # Successor overlaps with MY end
-            # Use OTHER file's range to know where successor's content begins
-            candidate = other_range.start
-            print(
-                f"[DEBUG]     successor (idx {other_idx}) > my_idx {my_idx}, candidate={candidate:.1f}"
-            )
-            if candidate < end_trim:
-                end_trim = candidate
+            # Successor: other file appears AFTER me
+            # Check if the match is at the END of my file (preview situation)
+            # If my_range.end is near my duration, the match is at my end = duplicate preview
+            if my_range.end > vf.duration - 60.0:
+                # Match at my end = I'm the predecessor with duplicate preview
+                # Keep up to where my unique content ends (before the dup)
+                candidate = my_range.start
+                print(f"[DEBUG]     successor: dup at MY end, trim MY end to {candidate:.1f}")
+                if candidate < end_trim:
+                    end_trim = candidate
+            else:
+                # Match elsewhere - this is NOT a duplicate preview to trim
+                print(f"[DEBUG]     successor: dup NOT at MY end, no trim")
 
     print(f"[DEBUG]   result: start_trim={start_trim:.1f}, end_trim={end_trim:.1f}")
     return start_trim, end_trim
