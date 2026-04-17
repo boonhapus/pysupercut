@@ -95,6 +95,8 @@ def _keep_range_for_file(
     start_trim = 0.0
     end_trim = vf.duration
 
+    print(f"[DEBUG] _keep_range_for_file: {vf.path.name}, duration={vf.duration:.1f}s")
+
     for m in matches:
         files = {m.file_a, m.file_b}
         if vf.path not in files:
@@ -108,10 +110,17 @@ def _keep_range_for_file(
         my_range = m.range_in_a if m.file_a == vf.path else m.range_in_b
         other_range = m.range_in_b if m.file_a == vf.path else m.range_in_a
 
+        print(
+            f"[DEBUG]   match with {other.name}: my_range={my_range.start:.1f}-{my_range.end:.1f}, other_range={other_range.start:.1f}-{other_range.end:.1f}"
+        )
+
         if other_idx < my_idx:
             # Predecessor overlaps with MY start
             # Use OTHER file's range to know where predecessor's content ends
             candidate = other_range.end
+            print(
+                f"[DEBUG]     predecessor (idx {other_idx}) < my_idx {my_idx}, candidate={candidate:.1f}"
+            )
             if candidate > start_trim:
                 start_trim = candidate
 
@@ -119,9 +128,13 @@ def _keep_range_for_file(
             # Successor overlaps with MY end
             # Use OTHER file's range to know where successor's content begins
             candidate = other_range.start
+            print(
+                f"[DEBUG]     successor (idx {other_idx}) > my_idx {my_idx}, candidate={candidate:.1f}"
+            )
             if candidate < end_trim:
                 end_trim = candidate
 
+    print(f"[DEBUG]   result: start_trim={start_trim:.1f}, end_trim={end_trim:.1f}")
     return start_trim, end_trim
 
 
@@ -139,6 +152,14 @@ def build_timeline(
     """
     ordered_paths = [vf.path for vf in video_files]
     dropped = _find_dropped(video_files, matches)
+
+    print(
+        f"[DEBUG] build_timeline: {len(video_files)} files, {len(matches)} matches, dropped={dropped}"
+    )
+    for i, m in enumerate(matches):
+        print(
+            f"[DEBUG]   match {i}: {m.file_a.name} [{m.range_in_a.start:.1f}-{m.range_in_a.end:.1f}] <-> {m.file_b.name} [{m.range_in_b.start:.1f}-{m.range_in_b.end:.1f}]"
+        )
 
     segments: list[Segment] = []
 
