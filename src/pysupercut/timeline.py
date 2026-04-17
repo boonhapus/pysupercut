@@ -18,9 +18,10 @@ class SegmentStatus(Enum):
 @dataclass
 class Segment:
     """A contiguous slice of a source file to include in the output."""
+
     file: Path
-    start: float        # seconds into the source file
-    end: float          # seconds into the source file (exclusive)
+    start: float  # seconds into the source file
+    end: float  # seconds into the source file (exclusive)
     status: SegmentStatus = SegmentStatus.KEEP
 
     @property
@@ -36,7 +37,10 @@ class Timeline:
 
 # ── Containment check ─────────────────────────────────────────────────────────
 
-def _is_contained(inner: VideoFile, outer: VideoFile, matches: list[OverlapMatch]) -> bool:
+
+def _is_contained(
+    inner: VideoFile, outer: VideoFile, matches: list[OverlapMatch]
+) -> bool:
     """True if inner is entirely duplicated within outer based on match ranges."""
     for m in matches:
         files = {m.file_a, m.file_b}
@@ -73,6 +77,7 @@ def _find_dropped(
 
 # ── Keep-range computation ────────────────────────────────────────────────────
 
+
 def _keep_range_for_file(
     vf: VideoFile,
     matches: list[OverlapMatch],
@@ -104,18 +109,24 @@ def _keep_range_for_file(
         other_range = m.range_in_b if m.file_a == vf.path else m.range_in_a
 
         if other_idx < my_idx:
-            # Predecessor ends with content that repeats at MY start → trim my start.
-            # my_range is where the overlap sits in my file; cut up to its end.
-            candidate = my_range.end
+            # Predecessor overlaps with MY start
+            # my_range.start marks where overlap begins in my file
+            candidate = my_range.start
             if candidate > start_trim:
                 start_trim = candidate
 
-        # Successors trim their own starts; we do not shorten our end here.
+        if other_idx > my_idx:
+            # Successor overlaps with MY end
+            # my_range.end marks where overlap ends in my file
+            candidate = my_range.end
+            if candidate < end_trim:
+                end_trim = candidate
 
     return start_trim, end_trim
 
 
 # ── Build timeline ────────────────────────────────────────────────────────────
+
 
 def build_timeline(
     video_files: list[VideoFile],
@@ -134,7 +145,12 @@ def build_timeline(
     for vf in video_files:
         if vf.path in dropped:
             segments.append(
-                Segment(file=vf.path, start=0.0, end=vf.duration, status=SegmentStatus.DROPPED)
+                Segment(
+                    file=vf.path,
+                    start=0.0,
+                    end=vf.duration,
+                    status=SegmentStatus.DROPPED,
+                )
             )
             continue
 
@@ -157,6 +173,7 @@ def build_timeline(
 
 
 # ── Duration invariant ────────────────────────────────────────────────────────
+
 
 def verify_duration_invariant(
     video_files: list[VideoFile],
