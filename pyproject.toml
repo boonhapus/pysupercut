@@ -1,10 +1,19 @@
 [project]
 name = "pysupercut"
 version = "0.1.0"
-description = "Add your description here"
+description = "Pre-processing engine for anime supercut creation: dedup and stitch episode files"
 readme = "README.md"
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "anyio>=4.13.0",
+    "av>=17.0.0",
+    "cyclopts>=4.10.2",
+    "imagehash>=4.3.2",
+    "structlog>=25.5.0",
+]
+
+[project.scripts]
+pysupercut = "pysupercut.cli:app"
 
 [build-system]
 requires = ["uv_build>=0.10.11,<0.11.0"]
