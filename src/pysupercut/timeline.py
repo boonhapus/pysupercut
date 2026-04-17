@@ -110,15 +110,15 @@ def _keep_range_for_file(
 
         if other_idx < my_idx:
             # Predecessor overlaps with MY start
-            # my_range.start marks where overlap begins in my file
-            candidate = my_range.start
+            # Use OTHER file's range to know where predecessor's content ends
+            candidate = other_range.end
             if candidate > start_trim:
                 start_trim = candidate
 
         if other_idx > my_idx:
             # Successor overlaps with MY end
-            # my_range.end marks where overlap ends in my file
-            candidate = my_range.end
+            # Use OTHER file's range to know where successor's content begins
+            candidate = other_range.start
             if candidate < end_trim:
                 end_trim = candidate
 
